@@ -9,7 +9,7 @@ import (
 	"github.com/davidonium/adventofcode/util"
 )
 
-const safeCount = 100
+const safeMaxNumber = 100
 
 func main() {
 	fd, err := os.Open("./input.txt")
@@ -40,49 +40,35 @@ func run(in io.Reader) error {
 		rc := t[1:]
 		c := util.ParseInt(rc)
 
+		clicked := false
 		switch dir {
 		case 'R':
 			fmt.Printf("R%d", c)
-			new := pos + c
-			if new+1 > safeCount {
-				pos = new % safeCount
-				times := (c / safeCount)
-				if times == 0 {
-					times = 1
+			for range c {
+				pos++
+				if pos > safeMaxNumber-1 {
+					pos = 0
+					safePwd++
+					clicked = true
 				}
-				// safePwd += times
-
-				fmt.Printf(" (new: %d, times: %d) ", new, times)
-			} else {
-				pos = new
 			}
 		case 'L':
 			fmt.Printf("L%d", c)
-			new := pos - c
-			if new < 0 {
-				pos = (new % safeCount)
-				if pos != 0 {
-					pos += safeCount
+			for range c {
+				pos--
+				if pos < 0 {
+					pos = safeMaxNumber - 1
+				} else if pos == 0 {
+					safePwd++
+					clicked = true
 				}
-				times := (c / safeCount)
-				if times == 0 {
-					times = 1
-				}
-				// safePwd += times
-
-				fmt.Printf(" (new: %d, times: %d) ", new, times)
-			} else {
-				pos = new
 			}
+
 		default:
 			panic(fmt.Sprintf("unknown direction '%s', expected 'R' or 'L'", string(dir)))
 		}
 
-		if pos == 0 {
-			safePwd++
-		}
-
-		fmt.Printf(" => %d\n", pos)
+		fmt.Printf(" (clicked: %t) => %d\n", clicked, pos)
 	}
 
 	fmt.Printf("\n\n\tSafe password is %d\n", safePwd)
