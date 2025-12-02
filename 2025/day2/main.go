@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"maps"
@@ -45,6 +46,10 @@ func run(in io.Reader) error {
 
 			for i := low; i <= high; i++ {
 				d := util.DigitCount(i)
+				// avoid counting single digit numbers, they don't repeat
+				if d == 1 {
+					continue
+				}
 
 				factors := []int{}
 				sq := int(math.Sqrt(float64(d)))
@@ -93,7 +98,8 @@ func run(in io.Reader) error {
 			}
 
 			ids := slices.Collect(maps.Keys(rangeInvalidIDs))
-			fmt.Printf("%d-%d: %v\n", low, high, ids)
+			// idv, _ := json.MarshalIndent(ids, "\t", " ")
+			// fmt.Printf("%d-%d: \n\t%s\n", low, high, idv)
 
 			invalidIDs = append(invalidIDs, ids...)
 		}
