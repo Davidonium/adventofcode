@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/davidonium/adventofcode/util"
@@ -35,6 +37,7 @@ func run(in io.Reader) error {
 
 		ranges := strings.SplitSeq(t, ",")
 		for r := range ranges {
+			rangeInvalidIDs := map[int]struct{}{}
 			parts := strings.Split(r, "-")
 
 			low := util.ParseInt(parts[0])
@@ -42,21 +45,57 @@ func run(in io.Reader) error {
 
 			for i := low; i <= high; i++ {
 				d := util.DigitCount(i)
-				if d%2 != 0 {
-					continue
+
+				factors := []int{}
+				sq := int(math.Sqrt(float64(d)))
+				for j := 1; j <= sq; j++ {
+					if d%j == 0 {
+						div := d / j
+
+						if div == j {
+							// example 9 / 3 = 3, gotta add 3
+							factors = append(factors, j)
+						} else {
+							// example 10 / 2 = 5, gotta add 2 and 5
+							factors = append(factors, j)
+
+							// not interested in the number itself on this exercise
+							// example 10 / 1 = 10, not adding it (but adding 1 in the previous line)
+							if div != d {
+								factors = append(factors, div)
+							}
+						}
+					}
 				}
 
-				mid := d / 2
-				div := int(math.Pow10(mid))
-				left :=  i / div
-				right := i % div
-				fmt.Printf("cmp: %d - (mid: %d) %d == %d", i, mid, left, right)
-				if left == right {
-					fmt.Print(" (!)")
-					invalidIDs = append(invalidIDs, i)
+				for _, div := range factors {
+					nums := map[int]struct{}{}
+					for j := d - div; j >= 0; j -= div {
+						// extract exact digits,
+						// example:
+						// 		i = 123456788 where div is 3 d is 9 and j is at 6
+						// 		123456789 / 10^6 = 123456
+						// 		123456 % 10^3 = 456
+						//
+						// 		i = 123456788 where div is 3 d is 9 and j is at 3
+						// 		123456789 / 10^3 = 123
+						// 		123 % 10^3 = 123
+						p := int(math.Pow10(j))
+						l := i / p
+						n := l % int(math.Pow10(div))
+						nums[n] = struct{}{}
+					}
+
+					if len(nums) == 1 {
+						rangeInvalidIDs[i] = struct{}{}
+					}
 				}
-				fmt.Print("\n")
 			}
+
+			ids := slices.Collect(maps.Keys(rangeInvalidIDs))
+			fmt.Printf("%d-%d: %v\n", low, high, ids)
+
+			invalidIDs = append(invalidIDs, ids...)
 		}
 	}
 
@@ -66,3 +105,4 @@ func run(in io.Reader) error {
 
 	return nil
 }
+
