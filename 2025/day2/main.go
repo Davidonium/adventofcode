@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/davidonium/adventofcode/util"
@@ -41,19 +41,21 @@ func run(in io.Reader) error {
 			high := util.ParseInt(parts[1])
 
 			for i := low; i <= high; i++ {
-				n := strconv.Itoa(i)
-				if len(n) % 2 != 0 {
+				d := util.DigitCount(i)
+				if d%2 != 0 {
 					continue
 				}
 
-				mid := len(n)/2
-				left := n[:mid]
-				right := n[mid:]
-
-				// fmt.Printf("cmp: %d - %s == %s\n", i, left, right)
+				mid := d / 2
+				div := int(math.Pow10(mid))
+				left :=  i / div
+				right := i % div
+				fmt.Printf("cmp: %d - (mid: %d) %d == %d", i, mid, left, right)
 				if left == right {
+					fmt.Print(" (!)")
 					invalidIDs = append(invalidIDs, i)
 				}
+				fmt.Print("\n")
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 package util
 
+import "math"
+
 // greatest common divisor (GCD) via Euclidean algorithm
 func GCD(a, b int) int {
 	for b != 0 {
@@ -22,6 +24,6 @@ func LCM(a, b int, integers ...int) int {
 }
 
 
-func Div(a, b int) {
-
+func DigitCount(n int) int {
+	return int(math.Floor(math.Log10(float64(n))+1))
 }
