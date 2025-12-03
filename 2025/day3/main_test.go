@@ -21,7 +21,7 @@ func TestChallenge(t *testing.T) {
 234234234234278
 818181911112111
 			`,
-			expect: "r=357",
+			expect: "r=3121910778619",
 		},
 	}
 

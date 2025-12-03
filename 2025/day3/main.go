@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
 
 	"github.com/davidonium/adventofcode/util"
@@ -24,6 +25,8 @@ func main() {
 	}
 }
 
+const totalBatteriesToActivate = 12
+
 func run(in io.Reader) error {
 	scanner := bufio.NewScanner(in)
 
@@ -32,7 +35,7 @@ func run(in io.Reader) error {
 		t := scanner.Text()
 		bank := Bank{}
 		for _, b := range t {
-			bank.Values = append(bank.Values, byte(util.ParseInt(string(b))))
+			bank.Values = append(bank.Values, util.ParseInt(string(b)))
 		}
 
 		banks = append(banks, bank)
@@ -40,28 +43,29 @@ func run(in io.Reader) error {
 	var values []int
 
 	for _, b := range banks {
-		firstIdx := 0
-		for j := 0; j < len(b.Values); j++ {
-			for z := firstIdx+1; z < len(b.Values); z++ {
-				first := b.Values[firstIdx]
-				vin := b.Values[z]
+		value := 0
+		cursor := 0
+		room := len(b.Values) - totalBatteriesToActivate
+		for i := range totalBatteriesToActivate {
+			from := cursor
+			until := from + room + 1
 
-				if vin > first && z < len(b.Values)-1 {
-					firstIdx = z
-					break
+			max := b.Values[from]
+			for j := from; j < until; j++ {
+				if b.Values[j] > max {
+					max = b.Values[j]
+					cursor = j
 				}
 			}
-		}
-
-		secondIdx := firstIdx+1
-		for j := firstIdx+1; j < len(b.Values); j++ {
-			v := b.Values[j]
-			if v > b.Values[secondIdx] {
-				secondIdx = j
+			room -= cursor - from
+			if cursor < len(b.Values)-1 {
+				cursor++
 			}
+
+			value += max * int(math.Pow10(totalBatteriesToActivate-i-1))
 		}
 
-		values = append(values, int(b.Values[firstIdx])*10 + int(b.Values[secondIdx]))
+		values = append(values, value)
 	}
 
 	fmt.Printf("r=%d\n", util.SumSlice(values))
@@ -70,5 +74,5 @@ func run(in io.Reader) error {
 }
 
 type Bank struct {
-	Values []byte
+	Values []int
 }
