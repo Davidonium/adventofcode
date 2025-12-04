@@ -66,9 +66,13 @@ func TestChallenge(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       string
+        expected    string
 	}{
         {
-            // TODO test case
+            // TODO fill with test cases
+            name: "",
+            input: "",
+            expected "",
         },
     }
 
@@ -94,12 +98,15 @@ func TestChallenge(t *testing.T) {
 			w.Close()
 			os.Stdout = stdout
 
-			output, err := io.ReadAll(r)
+			ob, err := io.ReadAll(r)
 			if err != nil {
 				t.Fatalf("could not read from output: %v", err)
 			}
 
-            // TODO test the thing
+            o := string(ob)
+            if !strings.Contains(o, tt.expected) {
+                t.Errorf("expected %s to be in the output:\n%\n", tt.expected, o)
+            }
 		})
 	}
 }
