@@ -57,8 +57,7 @@ func run(in io.Reader) error {
 	for {
 		total += g.ReachablePaperCount()
 		g.RemoveReachablePaper()
-		after := g.ReachablePaperCount()
-		if after == 0 {
+		if g.ReachablePaperCount() == 0 {
 			break
 		}
 	}
