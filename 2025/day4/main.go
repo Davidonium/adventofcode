@@ -53,7 +53,16 @@ func run(in io.Reader) error {
 		i++
 	}
 
-	fmt.Printf("The parsed grid:\n%s\n", g)
+	total := 0
+	for {
+		total += g.ReachablePaperCount()
+		g.RemoveReachablePaper()
+		after := g.ReachablePaperCount()
+		if after == 0 {
+			break
+		}
+	}
+	fmt.Printf("r=%d\n", total)
 
 	return nil
 }
@@ -65,25 +74,109 @@ const (
 	CellEmpty
 )
 
+type Point struct {
+	X int
+	Y int
+}
+
 type Grid struct {
 	Positions [][]Cell
 }
 
+func (g Grid) AdjacentPaperCount(x, y int) (int, error) {
+	if x < 0 || x > len(g.Positions[0]) {
+		return 0, fmt.Errorf("out of bounds, got (%d, %d) bounds: (%d, %d)", x, y, len(g.Positions[0]), len(g.Positions))
+	}
+	if y < 0 || y > len(g.Positions) {
+		return 0, fmt.Errorf("out of bounds, got (%d, %d) bounds: (%d, %d)", x, y, len(g.Positions[0]), len(g.Positions))
+	}
+
+	var positions []Point
+
+	if y+1 < len(g.Positions) {
+		positions = append(positions, Point{X: x, Y: y + 1})
+	}
+	if y-1 >= 0 {
+		positions = append(positions, Point{X: x, Y: y - 1})
+	}
+
+	if x+1 < len(g.Positions[0]) {
+		positions = append(positions, Point{X: x + 1, Y: y})
+		if y+1 < len(g.Positions) {
+			positions = append(positions, Point{X: x + 1, Y: y + 1})
+		}
+		if y-1 >= 0 {
+			positions = append(positions, Point{X: x + 1, Y: y - 1})
+		}
+	}
+
+	if x-1 >= 0 {
+		positions = append(positions, Point{X: x - 1, Y: y})
+		if y-1 >= 0 {
+			positions = append(positions, Point{X: x - 1, Y: y - 1})
+		}
+		if y+1 < len(g.Positions) {
+			positions = append(positions, Point{X: x - 1, Y: y + 1})
+		}
+	}
+
+	c := 0
+	for _, p := range positions {
+		if g.Positions[p.Y][p.X] == CellWithPaper {
+			c++
+		}
+	}
+	return c, nil
+}
+
 func (g Grid) String() string {
 	sb := &strings.Builder{}
-	for _, row := range g.Positions {
-		for _, col := range row {
-
+	for i, row := range g.Positions {
+		for j, col := range row {
 			switch col {
 			case CellEmpty:
-				sb.WriteString(".")
+				sb.WriteByte('.')
 			case CellWithPaper:
-				sb.WriteString("@")
+				c, _ := g.AdjacentPaperCount(j, i)
+				if c < 4 {
+					sb.WriteByte('x')
+				} else {
+					sb.WriteByte('@')
+				}
 			}
 		}
 
-		sb.WriteString("\n")
+		sb.WriteByte('\n')
 	}
 
 	return sb.String()
+}
+
+func (g Grid) ReachablePaperPoints() []Point {
+	var points []Point
+	for i, row := range g.Positions {
+		for j, col := range row {
+			if col == CellWithPaper {
+				c, _ := g.AdjacentPaperCount(j, i)
+				if c < 4 {
+					points = append(points, Point{X: j, Y: i})
+				}
+			}
+		}
+	}
+
+	return points
+}
+
+func (g Grid) ReachablePaperCount() int {
+	p := g.ReachablePaperPoints()
+	return len(p)
+}
+
+func (g *Grid) RemoveReachablePaper() {
+	pts := g.ReachablePaperPoints()
+
+	for _, p := range pts {
+		g.Positions[p.Y][p.X] = CellEmpty
+	}
 }

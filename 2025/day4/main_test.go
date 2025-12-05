@@ -26,7 +26,7 @@ func TestChallenge(t *testing.T) {
 @.@@@.@@@@
 .@@@@@@@@.
 @.@.@@@.@.`,
-			expected: "r=13",
+			expected: "r=43",
 		},
 	}
 
