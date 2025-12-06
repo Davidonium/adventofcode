@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 )
@@ -18,7 +19,7 @@ func ParseInt(s string) int {
 func ParseUInt64(s string) uint64 {
 	v, err := strconv.ParseUint(s, 10, 64)
 	if err != nil {
-		log.Printf("failed to parse \"%s\" to an integer. Returned 0 for dev speed.", s)
+		fmt.Printf("failed to parse \"%s\" to an integer. Returned 0 for dev speed.", s)
 		return 0
 	}
 

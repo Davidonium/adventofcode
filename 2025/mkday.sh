@@ -72,7 +72,7 @@ func TestChallenge(t *testing.T) {
             // TODO fill with test cases
             name: "",
             input: "",
-            expected "",
+            expected: "",
         },
     }
 
