@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -14,8 +15,7 @@ func TestChallenge(t *testing.T) {
 		expected string
 	}{
 		{
-			// TODO fill with test cases
-			name: "",
+			name: "example",
 			input: `
 3-5
 10-14
@@ -28,7 +28,7 @@ func TestChallenge(t *testing.T) {
 11
 17
 32`,
-			expected: "r=3",
+			expected: "r=14",
 		},
 	}
 
@@ -64,5 +64,19 @@ func TestChallenge(t *testing.T) {
 				t.Errorf("expected %s to be in the output:\n%s\n", tt.expected, o)
 			}
 		})
+	}
+}
+
+func TestPairCombinations(t *testing.T) {
+	i := [][2]uint64{{3, 5}, {10, 14}, {16, 20}, {12, 18}}
+	c := PairCombinations(i)
+
+	expect := [][2][2]uint64{
+		{{3, 5}, {10, 14}}, {{3, 5}, {16, 20}}, {{3, 5}, {12, 18}},
+		{{10, 14}, {16, 20}}, {{10, 14}, {12, 18}},
+		{{16, 20}, {12, 18}},
+	}
+	if !reflect.DeepEqual(c, expect) {
+		t.Errorf("input:\n\t%v\ngot:\n\t%v\nwant:\n\t%v\n", i, c, expect)
 	}
 }
