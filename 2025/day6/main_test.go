@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"unicode"
 )
 
 func TestChallenge(t *testing.T) {
@@ -19,8 +20,8 @@ func TestChallenge(t *testing.T) {
 123 328  51 64 
  45 64  387 23 
   6 98  215 314
-*   +   *   +`,
-            expected: "r=4277556",
+*   +   *   +  `,
+            expected: "r=3263827",
         },
     }
 
@@ -35,7 +36,7 @@ func TestChallenge(t *testing.T) {
 
 			os.Stdout = w
 
-			in := strings.NewReader(strings.TrimSpace(tt.input))
+			in := strings.NewReader(strings.TrimLeftFunc(tt.input, unicode.IsSpace))
 
 			if err := run(in); err != nil {
 				w.Close()
