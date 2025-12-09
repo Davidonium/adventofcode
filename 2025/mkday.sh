@@ -104,9 +104,9 @@ func TestChallenge(t *testing.T) {
 			}
 
             o := string(ob)
-            if !strings.Contains(o, tt.expected) {
-                t.Errorf("expected %s to be in the output:\n%\n", tt.expected, o)
-            }
+			if !strings.Contains(o, tt.expected) {
+				t.Errorf("failure\nwant:\n%s\ngot:\n%s\n", tt.expected, o)
+			}
 		})
 	}
 }
